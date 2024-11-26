@@ -1,3 +1,55 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@font-face {
+  font-family: 'GeistSans';
+  src: url('client/src/assets/fonts/webfonts/Geist-Thin.woff2') format('woff2');
+  font-weight: 100; /* Thin */
+  font-style: normal;
+}
+
+@font-face{
+  font-family: 'GeistSans';
+  src: url('client/src/assets/fonts/webfonts/Geist-Regular.woff2') format('woff2');
+  font-weight: 400; /* Regular */
+  font-style: normal;
+}
+
+@font-face{
+  font-family: 'GeistSans';
+  src: url('client/src/assets/fonts/webfonts/Geist-Medium.woff2') format('woff2');
+  font-weight: 500; /* Medium */
+  font-style: normal;
+}
+
+@font-face{
+  font-family: 'GeistSans';
+  src: url('client/src/assets/fonts/webfonts/Geist-SemiBold.woff2') format('woff2');
+  font-weight: 600; /* SemiBold */
+  font-style: normal;
+}
+
+@font-face{
+  font-family: 'GeistSans';
+  src: url('client/src/assets/fonts/webfonts/Geist-Bold.woff2') format('woff2');
+  font-weight: 700; /* Bold */
+  font-style: normal;
+}
+
+@font-face{
+  font-family: 'GeistSans';
+  src: url('client/src/assets/fonts/webfonts/Geist-Black.woff2') format('woff2');
+  font-weight: 900; /* Black */
+  font-style: normal;
+}
+
+
+
+body {
+  background-color: #000;
+}
+
+input::placeholder {
+  color: #3f3f46;
+}

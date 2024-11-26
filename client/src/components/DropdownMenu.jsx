@@ -1,0 +1,39 @@
+import React, { useState } from 'react'
+
+export default function DropdownMenu() {
+  const [isOpen, setIsOpen] = useState(false)
+  const [currentModel, setCurrentModel] = useState('Pilih Model');
+
+  const data = [
+    {label: 'Support Vector Machine', id: 1},
+    {label: 'Naive Bayes', id: 2},
+  ]
+
+  const handleOpen = () => {
+    setIsOpen(!isOpen);
+  }
+
+
+  return (
+    <div className='bg-zinc-900 border border-zinc-700 rounded-md mb-8' onClick={handleOpen}>
+      <div className='p-3 flex justify-between'>
+        <label htmlFor="" className='flex gap-2 items-center'>
+          {currentModel}
+        </label>
+        <label htmlFor="">v</label>
+      </div>
+
+      {isOpen && (
+        <div className="absolute sm:w-[49%] bg-white divide-gray-100 rounded-md shadow-lg ring-1 ring-black ring-opacity-5">
+          <div className="py-1">
+            {data.map((item, index) => (
+              <div key={index} className='px-4 py-2 hover:bg-gray-100 text-gray-700' onClick={() => setCurrentModel(item.label)}>
+                {item.label}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
