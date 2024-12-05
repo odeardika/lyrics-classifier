@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-function RadioOption({className, data}) {
+function RadioOption({className, data, handleRadio}) {
     
 
     const [radioOn , setRadioOn] = useState(0);
@@ -8,6 +8,7 @@ function RadioOption({className, data}) {
     const handleOnClick = (radioId) => {
 
         setRadioOn(radioId);
+        handleRadio(radioId);
     }
 
     return (

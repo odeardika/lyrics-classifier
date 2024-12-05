@@ -1,12 +1,18 @@
-import React from 'react'
+import React, { useState } from 'react'
 import DropdownMenu from './components/DropdownMenu'
 import RadioOption from './components/RadioOption'
 
 export default function App() {
   const radioButton = [
-    {label: 'Cari Lagu', isOn: false, id: 1},
+    {label: 'Cari Lagu', isOn: true, id: 1},
     {label: 'Masukan Lirik', isOn: false, id: 2},
   ]
+  
+  const [currentInput, setCurrentInput] = useState(2)
+
+  const handleOnClick = (radioId) => {
+    setCurrentInput(radioId);
+  }
 
 
   return (
@@ -15,10 +21,11 @@ export default function App() {
 
         <form action="" className='flex flex-col sm:w-2/4'>
           
-            <RadioOption className='flex flex-row mb-8 justify-center gap-4' data={radioButton} />
+            <RadioOption className='flex flex-row mb-8 justify-center gap-4' data={radioButton} handleRadio={handleOnClick}/>
           
             <DropdownMenu />
-          <input type="text" className='text-gray-50 p-3 bg-zinc-900 border border-zinc-700 rounded-md' placeholder='Masukan Nama Lagu dan Artis'/>
+
+            {currentInput === 1 ? <input type="text" className='text-gray-50 p-3 bg-zinc-900 border border-zinc-700 rounded-md' placeholder='Masukan Nama Lagu dan Artis'/> : <textarea name="" id="" rows={8} className='text-gray-50 p-3 bg-zinc-900 border border-zinc-700 rounded-md' placeholder='Masukan Lirik Lagu'></textarea>}
         </form>
     </div>
   )
