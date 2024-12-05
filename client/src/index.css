@@ -58,6 +58,10 @@ textarea {
   resize: none; /* Disables resizing */
 }
 
+textarea::placeholder {
+  color: #3f3f46;
+}
+
 /* For Webkit-based browsers (Chrome, Edge, Safari) */
 textarea::-webkit-scrollbar {
   width: 8px; /* Width of the scrollbar */

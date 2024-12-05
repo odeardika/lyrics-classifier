@@ -9,6 +9,7 @@ export default function App() {
   ]
   
   const [currentInput, setCurrentInput] = useState(2)
+  const [result, setResult] = useState('')
 
   const handleOnClick = (radioId) => {
     setCurrentInput(radioId);
@@ -26,6 +27,9 @@ export default function App() {
             <DropdownMenu />
 
             {currentInput === 1 ? <input type="text" className='text-gray-50 p-3 bg-zinc-900 border border-zinc-700 rounded-md' placeholder='Masukan Nama Lagu dan Artis'/> : <textarea name="" id="" rows={8} className='text-gray-50 p-3 bg-zinc-900 border border-zinc-700 rounded-md' placeholder='Masukan Lirik Lagu'></textarea>}
+            
+            {(result === 1) && <div className='bg-green-800 p-3 rounded-md mt-4'>Hasil: Lagu ini adalah lagu yang bahagia</div>}
+            {(result === 0) && <div className='bg-red-800 p-3 rounded-md mt-4'>Hasil: Lagu ini adalah lagu yang sedih</div>}
         </form>
     </div>
   )

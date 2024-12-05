@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { ChevronDownIcon } from "@heroicons/react/20/solid";
 
 export default function DropdownMenu() {
   const [isOpen, setIsOpen] = useState(false)
@@ -20,7 +21,7 @@ export default function DropdownMenu() {
         <label htmlFor="" className='flex gap-2 items-center'>
           {currentModel}
         </label>
-        <label htmlFor="">v</label>
+        <label htmlFor=""><ChevronDownIcon className="w-5 h-5 ml-2" /></label>
       </div>
 
       {isOpen && (
