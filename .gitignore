@@ -22,3 +22,17 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# vercel
+.vercel
+
+# Flask
+env
+
+#python
+__pycache__
+
+#testing
+test.py
+
+.env
