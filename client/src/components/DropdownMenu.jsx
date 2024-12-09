@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
 
-export default function DropdownMenu() {
+export default function DropdownMenu({onChange}) {
   const [isOpen, setIsOpen] = useState(false)
   const [currentModel, setCurrentModel] = useState('Pilih Model');
 
@@ -12,6 +12,11 @@ export default function DropdownMenu() {
 
   const handleOpen = () => {
     setIsOpen(!isOpen);
+  }
+
+  const handleClick = (model) =>{
+    setCurrentModel(model.label);
+    onChange(model.id);
   }
 
 
@@ -28,7 +33,7 @@ export default function DropdownMenu() {
         <div className="absolute sm:w-[49%] bg-white divide-gray-100 rounded-md shadow-lg ring-1 ring-black ring-opacity-5">
           <div className="py-1">
             {data.map((item, index) => (
-              <div key={index} className='px-4 py-2 hover:bg-gray-100 text-gray-700' onClick={() => setCurrentModel(item.label)}>
+              <div key={index} className='px-4 py-2 hover:bg-gray-100 text-gray-700' onClick={() => handleClick(item)}>
                 {item.label}
               </div>
             ))}

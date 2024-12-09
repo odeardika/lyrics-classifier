@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import DropdownMenu from './components/DropdownMenu'
 import RadioOption from './components/RadioOption'
-
+import { predict, searchAndPredict } from './api/post'
 export default function App() {
   const radioButton = [
     {label: 'Cari Lagu', isOn: true, id: 1},
@@ -10,11 +10,44 @@ export default function App() {
   
   const [currentInput, setCurrentInput] = useState(2)
   const [result, setResult] = useState('')
+  const [model, setModel] = useState()
+  const [lyric, setlyric] = useState('')
+  const [searchQuery, setSearchQuery] = useState('')
 
   const handleOnClick = (radioId) => {
     setCurrentInput(radioId);
   }
 
+  const handleKeyDownSearch = (e) => {
+    if (e.key === "Enter" && !e.shiftKey && !e.ctrlKey && !e.altKey && !e.metaKey) {
+      e.preventDefault();
+      const data = {
+        query: searchQuery,
+        model : model
+      }
+      searchAndPredict(data).then((res) => {
+        setResult(res.emotion)
+        console.log(res)
+      })
+    }
+  }
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" && !e.shiftKey && !e.ctrlKey && !e.altKey && !e.metaKey) {
+      const data = {
+        lyric: lyric,
+        model : model
+      }
+      // console.log(data)
+      predict(data).then((res) => {
+        setResult(res.emotion)
+        console.log(res)
+      })
+    }
+  }
+
+  const handleModel = (model) => {
+    setModel(model)
+  }
 
   return (
     <div className='flex flex-col text-white px-4 pt-20 h-screen gap-10 items-center'>
@@ -24,9 +57,11 @@ export default function App() {
           
             <RadioOption className='flex flex-row mb-8 justify-center gap-4' data={radioButton} handleRadio={handleOnClick}/>
           
-            <DropdownMenu />
+            <DropdownMenu onChange={handleModel}/>
 
-            {currentInput === 1 ? <input type="text" className='text-gray-50 p-3 bg-zinc-900 border border-zinc-700 rounded-md' placeholder='Masukan Nama Lagu dan Artis'/> : <textarea name="" id="" rows={8} className='text-gray-50 p-3 bg-zinc-900 border border-zinc-700 rounded-md' placeholder='Masukan Lirik Lagu'></textarea>}
+            {currentInput === 1 ? 
+            <input type="text" className='text-gray-50 p-3 bg-zinc-900 border border-zinc-700 rounded-md' placeholder='Masukan Nama Lagu dan Artis' onKeyDown={handleKeyDownSearch} value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}/> 
+            : <textarea name="" id="" onKeyDown={handleKeyDown} rows={8} placeholder='Masukan Lirik Lagu' className='text-gray-50 p-3 bg-zinc-900 border border-zinc-700 rounded-md' value={lyric} onChange={(e) => setlyric(e.target.value)}></textarea>}
             
             {(result === 1) && <div className='bg-green-800 p-3 rounded-md mt-4'>Hasil: Lagu ini adalah lagu yang bahagia</div>}
             {(result === 0) && <div className='bg-red-800 p-3 rounded-md mt-4'>Hasil: Lagu ini adalah lagu yang sedih</div>}
