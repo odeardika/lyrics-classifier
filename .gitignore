@@ -32,4 +32,7 @@ env
 #python
 __pycache__
 
+#testing
+test.py
+
 .env
