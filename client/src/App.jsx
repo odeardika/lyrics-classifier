@@ -26,8 +26,14 @@ export default function App() {
         model : model
       }
       searchAndPredict(data).then((res) => {
-        setResult(res.emotion)
-        console.log(res)
+        if (res.status === 404) {
+          if (res.message === 'lyric not found') {
+            setResult(res.message)
+          }
+        }
+        else {
+          setResult(res.emotion)
+        }
       })
     }
   }
@@ -39,8 +45,14 @@ export default function App() {
       }
       // console.log(data)
       predict(data).then((res) => {
-        setResult(res.emotion)
-        console.log(res)
+        if (res.status === 404) {
+          if (res.message === 'lyric not found') {
+            setResult(res.message)
+          }
+        }
+        else {
+          setResult(res.emotion)
+        }
       })
     }
   }
@@ -65,6 +77,7 @@ export default function App() {
             
             {(result === 1) && <div className='bg-green-800 p-3 rounded-md mt-4'>Hasil: Lagu ini adalah lagu yang bahagia</div>}
             {(result === 0) && <div className='bg-red-800 p-3 rounded-md mt-4'>Hasil: Lagu ini adalah lagu yang sedih</div>}
+            {(result === 'lyric not found') && <div className='bg-blue-800 p-3 rounded-md mt-4'>Lirik tidak ditemukan pada database</div>}
         </form>
     </div>
   )
