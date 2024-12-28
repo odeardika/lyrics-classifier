@@ -13,14 +13,35 @@ export default function App() {
   const [model, setModel] = useState()
   const [lyric, setlyric] = useState('')
   const [searchQuery, setSearchQuery] = useState('')
+  const [errorSelectedModel, setErrorSelectedModel] = useState(false);
 
   const handleOnClick = (radioId) => {
     setCurrentInput(radioId);
   }
 
+  const handleErrorSelectedModel = () => {
+    if (model === undefined) {
+      setErrorSelectedModel(true);
+      console.log(model)
+      return true;
+    }
+    else {
+      setErrorSelectedModel(false);
+      console.log(model)
+      return false;
+    }
+  }
+
   const handleKeyDownSearch = (e) => {
     if (e.key === "Enter" && !e.shiftKey && !e.ctrlKey && !e.altKey && !e.metaKey) {
       e.preventDefault();
+      e.target.blur();
+      setResult('');
+
+      if (handleErrorSelectedModel()) {
+        return;
+      }
+
       const data = {
         query: searchQuery,
         model : model
@@ -39,15 +60,23 @@ export default function App() {
   }
   const handleKeyDown = (e) => {
     if (e.key === "Enter" && !e.shiftKey && !e.ctrlKey && !e.altKey && !e.metaKey) {
+      e.target.blur();
+      setResult('');
+      const isModelSelected = handleErrorSelectedModel();
+      if (isModelSelected) {
+        return;
+      }
+
       const data = {
         lyric: lyric,
-        model : model
+        model: model
       }
-      // console.log(data)
+      console.log("running")
+      
       predict(data).then((res) => {
         if (res.status === 404) {
           if (res.message === 'lyric not found') {
-            setResult(res.message)
+        setResult(res.message)
           }
         }
         else {
@@ -69,6 +98,7 @@ export default function App() {
           
             <RadioOption className='flex flex-row mb-8 justify-center gap-4' data={radioButton} handleRadio={handleOnClick}/>
           
+            <div className={`text-red-800 ${errorSelectedModel ? '' : 'hidden'}`}> * Tolong Pilih Model Terlebih Dahulu</div>
             <DropdownMenu onChange={handleModel}/>
 
             {currentInput === 1 ? 
