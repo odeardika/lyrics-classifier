@@ -1,63 +1,49 @@
-from dotenv import dotenv_values
-from re import sub as re_sub
-from clasification.lyrics import get_lyrics
-from clasification.preprocessing import text_preprocessing
-import pickle
+import sys
+import os
+import joblib
 
+from .lyrics import get_lyrics
+from .preprocessing import text_preprocessing
 
+current_path = os.path.dirname(os.path.realpath(__file__))
+models_path = os.path.join(current_path, "models")
 
-config = dotenv_values('.env')
+if models_path not in sys.path:
+    sys.path.append(models_path)
+
+tfidf = joblib.load(os.path.join(models_path, "output/tfidf.joblib"))
+mnb = joblib.load(os.path.join(models_path, "output/model_mnb.joblib"))
+svm = joblib.load(os.path.join(models_path, "output/model_svm.joblib"))
 
 list_model = {
-    1 : 'models/model_svm.pkl',
-    2 : 'models/model_mnb.pkl'
+    1: svm,
+    2: mnb,
 }
 
-def search_song_request(query : str, model : int):
+
+def search_song_request(query: str, model: int):
     lyric = get_lyrics(query)
-    if lyric == 'not found':
-        return {
-            'status' : 404,
-            'message' : 'lyric not found'
-        }
-    
-    # transform tfidf
-    with open(f'models/tfidf_vector.pkl', 'rb') as tfidf_file:
-        tfidf = pickle.load(tfidf_file)
-    
-    lyric = tfidf.transform(' '.join(sentence) for sentence in lyric)
-    
-    # select and pickle.load model
-    with open(list_model[model], 'rb') as model_file:
-        model = pickle.load(model_file)
-        
-    prediction = model.predict(lyric)
-    
+    if lyric == "not found":
+        return {"status": 404, "message": "lyric not found"}
+
+    lyric_transformed = tfidf.transform(" ".join(sentence) for sentence in lyric)
+    selected_model = list_model[model]
+    prediction = selected_model.predict(lyric_transformed)
     return {
-        'status' : 200,
-        'emotion' : prediction.tolist()[0],
+        "status": 200,
+        "emotion": prediction.tolist()[0],
     }
-    
-def predict_emotion(lyric : str, model : int):
+
+
+def predict_emotion(lyric: str, model: int):
     lyric = text_preprocessing(lyric)
-    
-    
-    # transform tfidf
-    with open(f'models/tfidf_vector.pkl', 'rb') as tfidf_file:
-        tfidf = pickle.load(tfidf_file)
-    
-    lyric = tfidf.transform(' '.join(sentence) for sentence in lyric)
-    
-    
-    # select and pickle.load model
-    with open(list_model[model], 'rb') as model_file:
-        model = pickle.load(model_file)
-        
-    prediction = model.predict(lyric)
-    
+    lyric_transformed = tfidf.transform(" ".join(sentence) for sentence in lyric)
+
+    selected_model = list_model[model]
+
+    prediction = selected_model.predict(lyric_transformed)
+
     return {
-        'status' : 200,
-        'emotion' : prediction.tolist()[0],
+        "status": 200,
+        "emotion": prediction.tolist()[0],
     }
-
-
