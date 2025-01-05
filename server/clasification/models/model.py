@@ -140,45 +140,55 @@ class TFIDF:
     
 class SVM:
     def __init__(self, C=1, tol=1e-4):
+        # Initialize the hyperparameters: C (regularization) and tol (tolerance for support vectors)
         self.C = C
         self.tol = tol
-        self.w = None
-        self.b = None
+        self.w = None  # Weight vector
+        self.b = None  # Bias term
 
     def fit(self, X, y):
         n_samples, n_features = X.shape
 
         # Ensure y is a column vector
+        # Step 1: y should be reshaped into a column vector for compatibility in computations
         y = y.reshape(-1, 1) * 1.0
 
         # Compute Gram matrix
+        # Step 2: Compute the Gram matrix (Kij = xi · xj)
         K = np.dot(X, X.T)
 
         # Formulate QP problem
-        P = matrix(np.outer(y, y) * K)
-        q = matrix(-np.ones((n_samples, 1)))
-        A = matrix(y.T.astype(float))
-        b = matrix(np.zeros(1))
-        G = matrix(np.vstack((-np.eye(n_samples), np.eye(n_samples))))
-        h = matrix(np.vstack((np.zeros((n_samples, 1)), np.ones((n_samples, 1)) * self.C)))
+        # Step 3: Define the quadratic programming problem components
+        P = matrix(np.outer(y, y) * K)  # Quadratic term in QP (Pij = yi * yj * Kij)
+        q = matrix(-np.ones((n_samples, 1)))  # Linear term in QP
+        A = matrix(y.T.astype(float))  # Equality constraint (sum of alpha * y = 0)
+        b = matrix(np.zeros(1))  # Scalar for equality constraint
+        G = matrix(np.vstack((-np.eye(n_samples), np.eye(n_samples))))  # Inequality constraint (G matrix)
+        h = matrix(np.vstack((np.zeros((n_samples, 1)), np.ones((n_samples, 1)) * self.C)))  # Bounds for inequality
 
         # Solve QP problem
-        solvers.options['show_progress'] = False
+        # Step 4: Solve the quadratic programming problem to get alpha values
+        solvers.options['show_progress'] = False  # Suppress solver output
         solution = solvers.qp(P, q, G, h, A, b)
-        alphas = np.ravel(solution['x'])
+        alphas = np.ravel(solution['x'])  # Extract the solution vector (alpha)
 
         # Identify support vectors
+        # Step 5: Identify support vectors (alpha > tolerance)
         sv = alphas > self.tol
-        self.support_vectors_ = X[sv]
-        self.alphas = alphas[sv]
-        self.sv_y = y[sv]
+        self.support_vectors_ = X[sv]  # Support vectors from X
+        self.alphas = alphas[sv]  # Alphas corresponding to support vectors
+        self.sv_y = y[sv]  # Labels of support vectors
 
         # Calculate weights
+        # Step 6: Compute weight vector w = sum(alpha * y * X)
         self.w = np.sum(self.alphas[:, None] * self.sv_y * self.support_vectors_, axis=0)
 
         # Calculate bias
+        # Step 7: Compute bias term b = mean(y - w · x) for support vectors
         self.b = np.mean(self.sv_y - np.dot(self.support_vectors_, self.w))
 
     def predict(self, X):
+        # Compute the decision boundary (raw predictions)
         raw_prediction = np.dot(X, self.w) + self.b
+        # Step 8: Apply decision rule: if raw_prediction >= 0, predict 1; otherwise, 0
         return np.where(raw_prediction >= 0, 1, 0)
