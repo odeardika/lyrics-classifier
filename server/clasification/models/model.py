@@ -139,115 +139,56 @@ class TFIDF:
         return self.transform(data)
     
 class SVM:
-    def __init__(self, C=1.0, tol=1e-5):
-        """
-        Inisialisasi model SVM.
-        
-        Parameter:
-        - C (float): Parameter regularisasi (default: 1.0)
-        - tol (float): Toleransi untuk identifikasi support vectors (default: 1e-5)
-        """
+    def __init__(self, C=1, tol=1e-4):
+        # Initialize the hyperparameters: C (regularization) and tol (tolerance for support vectors)
         self.C = C
         self.tol = tol
-        self.w = None  # Vektor bobot (weight vector)
-        self.b = None  # Bias
-        self.support_vectors_ = None  # Support vectors
-        self.alphas = None  # Lagrange multipliers (alpha)
-        self.sv_y = None  # Label support vectors
+        self.w = None  # Weight vector
+        self.b = None  # Bias term
 
     def fit(self, X, y):
-        """
-        Melatih model SVM menggunakan formulasi dual dan quadratic programming.
-        
-        Parameter:
-        - X (np.array): Matriks fitur berukuran (n_samples, n_features)
-        - y (np.array): Vektor label berukuran (n_samples,)
-        """
         n_samples, n_features = X.shape
-        
-        # Pastikan y berbentuk vektor kolom dan bertipe float
-        y = y.reshape(-1, 1).astype(np.float64)
-        
-        # --- Langkah 1: Hitung Gram matrix untuk kernel linear ---
-        # K_ij = X_i · X_j (dot product)
-        # Sesuai rumus: K = X @ X.T
-        K = np.dot(X, X.T)
-        
-        # --- Langkah 2: Siapkan parameter quadratic programming (QP) ---
-        # Quadratic term: P_ij = y_i y_j K_ij
-        # Sesuai rumus: P = np.outer(y, y) * K
-        P = matrix(np.outer(y, y) * K)  # (n_samples, n_samples)
-        
-        # Linear term: q = -1 (karena kita memaksimalkan sum(alpha) - 0.5*alpha^T P alpha)
-        q = matrix(-np.ones((n_samples, 1)))  # (n_samples, 1)
-        
-        # --- Kendala Inequality: 0 <= alpha_i <= C ---
-        # Bentuk matriks G dan h untuk kendala box:
-        # -alpha_i <= 0 --> G_upper = -I, h_upper = 0
-        # alpha_i <= C  --> G_lower = I, h_lower = C
-        G_upper = -np.eye(n_samples)  # Bagian untuk -alpha_i <= 0
-        G_lower = np.eye(n_samples)   # Bagian untuk alpha_i <= C
-        G = matrix(np.vstack((G_upper, G_lower)))  # Gabung kedua bagian
-        
-        h_upper = np.zeros((n_samples, 1))
-        h_lower = np.ones((n_samples, 1)) * self.C
-        h = matrix(np.vstack((h_upper, h_lower)))  # (2*n_samples, 1)
-        
-        # --- Kendala Equality: sum(alpha_i y_i) = 0 ---
-        # Bentuk matriks A dan b
-        A = matrix(y.T.astype(np.float64))  # (1, n_samples)
-        b = matrix(0.0)  # Skalar 0
-        
-        # --- Langkah 3: Solve QP problem ---
-        solvers.options['show_progress'] = False  # Nonaktifkan output solver
-        solution = solvers.qp(P, q, G, h, A, b)
-        
-        # Ekstrak solusi alpha
-        alphas = np.ravel(solution['x'])  # (n_samples,)
-        
-        # --- Langkah 4: Identifikasi Support Vectors ---
-        # Support vectors adalah sampel dengan alpha_i > toleransi
-        sv_mask = alphas > self.tol
-        self.support_vectors_ = X[sv_mask]
-        self.alphas = alphas[sv_mask]
-        self.sv_y = y[sv_mask]
-        
-        # --- Langkah 5: Hitung Bobot (w) dan Bias (b) ---
-        # Rumus bobot: w = sum(alpha_i y_i X_i)
-        self.w = np.sum(self.alphas[:, np.newaxis] * self.sv_y * self.support_vectors_, axis=0)
-        
-        # Rumus bias: b = rata-rata(y_i - w·X_i) untuk semua support vectors
-        self.b = np.mean(self.sv_y - np.dot(self.support_vectors_, self.w))
-        
-    def predict(self, X):
-        """
-        Melakukan prediksi pada data baru.
-        
-        Parameter:
-        - X (np.array): Matriks fitur berukuran (n_samples, n_features)
-        
-        Returns:
-        - Prediksi kelas (0 atau 1) sebagai np.array
-        """
-        # Hitung nilai decision function: f(x) = w·X + b
-        decision_values = np.dot(X, self.w) + self.b
-        
-        # Terapkan aturan threshold: f(x) >= 0 → kelas 1, else kelas 0
-        return np.where(decision_values >= 0, 1, 0).astype(int)
 
-class SVM:
-    def __init__(self, C=1.0, tol=1e-5):
-        """
-        Inisialisasi model SVM.
-        
-        Parameter:
-        - C (float): Parameter regularisasi (default: 1.0)
-        - tol (float): Toleransi untuk identifikasi support vectors (default: 1e-5)
-        """
-        self.C = C
-        self.tol = tol
-        self.w = None  # Vektor bobot (weight vector)
-        self.b = None  # Bias
-        self.support_vectors_ = None  # Support vectors
-        self.alphas = None  # Lagrange multipliers (alpha)
-        self.sv_y = None  # Label support vectors
+        # Ensure y is a column vector
+        # Step 1: y should be reshaped into a column vector for compatibility in computations
+        y = y.reshape(-1, 1) * 1.0
+
+        # Compute Gram matrix
+        # Step 2: Compute the Gram matrix (Kij = xi · xj)
+        K = np.dot(X, X.T)
+
+        # Formulate QP problem
+        # Step 3: Define the quadratic programming problem components
+        P = matrix(np.outer(y, y) * K)  # Quadratic term in QP (Pij = yi * yj * Kij)
+        q = matrix(-np.ones((n_samples, 1)))  # Linear term in QP
+        A = matrix(y.T.astype(float))  # Equality constraint (sum of alpha * y = 0)
+        b = matrix(np.zeros(1))  # Scalar for equality constraint
+        G = matrix(np.vstack((-np.eye(n_samples), np.eye(n_samples))))  # Inequality constraint (G matrix)
+        h = matrix(np.vstack((np.zeros((n_samples, 1)), np.ones((n_samples, 1)) * self.C)))  # Bounds for inequality
+
+        # Solve QP problem
+        # Step 4: Solve the quadratic programming problem to get alpha values
+        solvers.options['show_progress'] = False  # Suppress solver output
+        solution = solvers.qp(P, q, G, h, A, b)
+        alphas = np.ravel(solution['x'])  # Extract the solution vector (alpha)
+
+        # Identify support vectors
+        # Step 5: Identify support vectors (alpha > tolerance)
+        sv = alphas > self.tol
+        self.support_vectors_ = X[sv]  # Support vectors from X
+        self.alphas = alphas[sv]  # Alphas corresponding to support vectors
+        self.sv_y = y[sv]  # Labels of support vectors
+
+        # Calculate weights
+        # Step 6: Compute weight vector w = sum(alpha * y * X)
+        self.w = np.sum(self.alphas[:, None] * self.sv_y * self.support_vectors_, axis=0)
+
+        # Calculate bias
+        # Step 7: Compute bias term b = mean(y - w · x) for support vectors
+        self.b = np.mean(self.sv_y - np.dot(self.support_vectors_, self.w))
+
+    def predict(self, X):
+        # Compute the decision boundary (raw predictions)
+        raw_prediction = np.dot(X, self.w) + self.b
+        # Step 8: Apply decision rule: if raw_prediction >= 0, predict 1; otherwise, 0
+        return np.where(raw_prediction >= 0, 1, 0)
