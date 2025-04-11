@@ -1,7 +1,7 @@
 "use client";
 import React from 'react';
 import Image from 'next/image';
-import icon from '@/public/tailwind-css-svgrepo-com.svg';
+import icon from '@/public/Logo.svg';
 import Navbar from '@components/Navbar/Navbar';
 import HamburgerButton from '@/components/Button/HamburgerButton/HamburgerButton';
 
