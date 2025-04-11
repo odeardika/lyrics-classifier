@@ -7,7 +7,7 @@ import HamburgerButton from '@/components/Button/HamburgerButton/HamburgerButton
 
 function Header() {
   return (
-    <header className='flex items-center justify-between p-4 shadow-md  lg:px-24'>
+    <header className='flex sticky top-0 z-50 bg-white items-center justify-between p-4 shadow-md  lg:px-24'>
         <a href="#" className='flex items-center gap-2 text-xl font-medium text-slate-800'>
             <Image src={icon} alt="Logo" width={50} height={50} className='rounded-full' />
             <span>Lyrics Classifier</span>
