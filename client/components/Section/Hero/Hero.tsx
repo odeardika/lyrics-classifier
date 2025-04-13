@@ -18,7 +18,7 @@ function Hero() {
                     />
                 </div>
                 <p className='text-lg text-justify font-light text-slate-500 md:text-base'>This web application leverages machine learning to analyze and classify song lyrics. By processing the textual content of lyrics, the application can identify patterns, themes, or genres, providing users with insights into the characteristics of the songs.</p>
-                <a href="#features" className='px-6 py-3 text-white bg-sky-600 rounded-lg hover:bg-sky-700'>Get Started</a>
+                <a href="/predict" className='px-6 py-3 text-white bg-sky-600 rounded-lg hover:bg-sky-700'>Get Started</a>
             </div>
             <div className='hidden lg:flex lg:w-1/2 lg:justify-center'>
                 <Image
