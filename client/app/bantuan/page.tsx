@@ -7,7 +7,7 @@ export default function About() {
             <Header />
             <div className='flex flex-col items-center justify-center h-screen'>
                 <h1 className="text-4xl text-blue-400 font-bold">
-                    Coming Soon
+                    Segera Datang...
                 </h1>
             </div>
         </div>
