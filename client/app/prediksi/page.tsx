@@ -7,8 +7,8 @@ import Image from "next/image";
 export default function Page() {
     const emotionsDict = {
         null: "null",
-        0: "sad",
-        1: "happy"
+        0: "sedih",
+        1: "bahagia"
     };
     const [lyrics, setLyrics] = React.useState("");
     const [model, setModel] = React.useState(2);
@@ -47,11 +47,11 @@ export default function Page() {
             <Headers />
 
             <div className="flex flex-col items-center justify-center ">
-                <h1 className="text-2xl text-sky-600 font-bold my-5">Clasify Lyrics</h1>
+                <h1 className="text-2xl text-sky-600 font-bold my-5">Pengklasifikasi Lirik</h1>
                 <div className="flex flex-col items-center justify-center w-full md:w-3/4 px-6">
                     <textarea
                         name="lyrics"
-                        placeholder="Enter lyrics here..."
+                        placeholder="Masukkan lirik di sini..."
                         rows={10}
                         className="w-full p-2 border border-gray-300 rounded-t-md"
                         value={lyrics}
@@ -63,7 +63,7 @@ export default function Page() {
                             className="bg-sky-600 text-white p-2 rounded-md hover:bg-sky-700 hover:cursor-pointer"
                             onClick={handlePredictClick}
                         >
-                            Predict
+                            Prediksi
                         </button>
                         <div className="dropdown flex flex-col items-center">
                             <div className="flex items-center justify-end gap-2 p-1 w-full rounded-sm hover:cursor-pointer hover:bg-sky-200" onClick={handleDropdownToggle}>
@@ -84,8 +84,8 @@ export default function Page() {
                     {
                         isLyricsNotValid && (
                             <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mt-5 w-full" role="alert">
-                                <strong className="font-bold">Error!</strong>
-                                <span className="block sm:inline"> Please enter lyrics first.</span>
+                                <strong className="font-bold">Kesalahan!</strong>
+                                <span className="block sm:inline"> Silakan masukkan lirik terlebih dahulu.</span>
                             </div>
                         )
                     }
@@ -93,8 +93,8 @@ export default function Page() {
                     {
                         result !== null && (
                             <div id="Result" className="border border-gray-300 rounded-md w-full my-5 p-4">
-                                <h2>Result : </h2>
-                                <p>The text <span className="text-sky-600">data</span> you are input is <span className={`${(result === 0) ? "text-red-500" : "text-green-500"}`}>{emotionsDict[result]}</span></p>
+                                <h2>Hasil : </h2>
+                                <p>Teks <span className="text-sky-600">data</span> yang Anda masukkan adalah <span className={`${(result === 0) ? "text-red-500" : "text-green-500"}`}>{emotionsDict[result]}</span></p>
                             </div>
                         )
                     }
