@@ -1,6 +1,6 @@
 import numpy as np
 
-def accuracy(y_true, y_pred):
+def accuracy_score(y_true, y_pred):
     """
     Calculate the accuracy of predictions.
     Accuracy = (True Positives + True Negatives) / Total Samples
@@ -10,7 +10,7 @@ def accuracy(y_true, y_pred):
     return correct / total
 
 
-def precision(y_test, y_pred):
+def precision_score(y_test, y_pred):
     """
     Calculate the precision of predictions.
     Precision = True Positives / (True Positives + False Positives)
@@ -32,7 +32,7 @@ def precision(y_test, y_pred):
     return TP / (TP + FP)
 
 
-def recall(y_test, y_pred):
+def recall_score(y_test, y_pred):
     """
     Calculate the recall of predictions.
     Recall = True Positives / (True Positives + False Negatives)
@@ -78,3 +78,4 @@ def f1_score(y_test, y_pred):
     if precision + recall == 0:
         return 0
     return 2 * (precision * recall) / (precision + recall)
+
