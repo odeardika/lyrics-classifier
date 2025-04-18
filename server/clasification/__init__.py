@@ -37,13 +37,30 @@ def search_song_request(query: str, model: int):
 
 def predict_emotion(lyric: str, model: int):
     lyric = text_preprocessing(lyric)
-    lyric_transformed = tfidf.transform(" ".join(sentence) for sentence in lyric)
+    lyric_transformed = tfidf.transform([" ".join(sentence) for sentence in lyric])
 
     selected_model = list_model[model]
 
     prediction = selected_model.predict(lyric_transformed)
 
-    return {
-        "status": 200,
-        "emotion": prediction.tolist()[0],
-    }
+    
+    if model == 2 :
+        # Multinomial Naive Bayes model
+        
+        probabilities = selected_model.predict_proba_percent(lyric_transformed)[0]
+        print(float(probabilities[0]), float(probabilities[1]))
+        
+        return {
+            "status": 200,
+            "emotion": prediction.tolist()[0],
+            "probabilities": {
+                "happy": float(probabilities[1]),
+                "sad": float(probabilities[0]),
+            },
+        }
+        
+    else:
+        return {
+            "status": 200,
+            "emotion": prediction.tolist()[0],
+        }

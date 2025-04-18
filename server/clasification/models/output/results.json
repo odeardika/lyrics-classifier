@@ -46,7 +46,7 @@
                 ]
             }
         },
-        "final_model": "<model.MultinomialNaiveBayes object at 0x00000275C0393E90>"
+        "final_model": "<model.MultinomialNaiveBayes object at 0x000001EB4517D5B0>"
     },
     "SVM": {
         "metrics": {
@@ -95,6 +95,6 @@
                 ]
             }
         },
-        "final_model": "<model.SVM object at 0x00000275C036A9F0>"
+        "final_model": "<model.SVM object at 0x000001EB4517E270>"
     }
 }

@@ -2,6 +2,7 @@ import numpy as np
 from collections import Counter
 import re
 from cvxopt import matrix, solvers
+from scipy.special import logsumexp
 
 
 class MultinomialNaiveBayes:
@@ -22,6 +23,36 @@ class MultinomialNaiveBayes:
             # for each feature, sum all occurrence of that feature
             # divide it by (sum features in that class + total feature)
             self.feature_likelihoods[cls] = (np.sum(X_cls, axis=0) + 1) / (np.sum(X_cls) + X.shape[1])
+
+    def predict_proba_percent(self, X):
+        """Returns probability percentages in {class: percentage} format"""
+        probabilities = []
+        
+        for x in X:
+            log_posteriors = {}
+            
+            # Calculate log posteriors for each class (same as predict() logic)
+            for cls in self.classes:
+                log_posterior = np.log(self.class_priors[cls])
+                log_posterior += np.sum(np.log(self.feature_likelihoods[cls]) * x)
+                log_posteriors[cls] = log_posterior
+            
+            # Convert to numpy array of log probabilities
+            log_probs = np.array(list(log_posteriors.values()))
+            
+            # Normalize using logsumexp to get probabilities
+            log_probs_normalized = log_probs - logsumexp(log_probs)
+            class_probs = np.exp(log_probs_normalized) * 100
+            
+            # Create dictionary with class labels
+            prob_dict = {
+                cls: round(class_probs[i], 4)
+                for i, cls in enumerate(log_posteriors.keys())
+            }
+            
+            probabilities.append(prob_dict)
+        
+        return probabilities
 
     def predict(self, X):
         predictions = []
