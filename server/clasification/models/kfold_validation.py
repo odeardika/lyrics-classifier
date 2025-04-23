@@ -34,7 +34,7 @@ def KFoldValidation(naive_bayes, svm, X, y, n_splits=5):
         
         # Train and evaluate SVM
         svm_clone = deepcopy(sv)
-        svm_clone.fit(X_train, y_train)
+        svm_clone.fit(X_train, np.where(y_train <= 0, -1, 1))
         y_pred_svm = svm_clone.predict(X_test)
         
         metrics['svm']['accuracy'].append(accuracy_score(y_test, y_pred_svm))
@@ -58,7 +58,7 @@ def KFoldValidation(naive_bayes, svm, X, y, n_splits=5):
     
     # Train final models on the entire dataset
     naive_bayes.fit(X, y)
-    svm.fit(X, y)
+    svm.fit(X_train, np.where(y_train <= 0, -1, 1))
     
     # Add final models to results
     results['naive_bayes']['final_model'] = naive_bayes

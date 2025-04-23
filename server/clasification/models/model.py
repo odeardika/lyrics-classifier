@@ -172,96 +172,134 @@ class TFIDF:
 class SVM:
     def __init__(self, C=1.0, tol=1e-5):
         """
-        Inisialisasi model SVM.
+        Initialize the SVM model.
         
-        Parameter:
-        - C (float): Parameter regularisasi (default: 1.0)
-        - tol (float): Toleransi untuk identifikasi support vectors (default: 1e-5)
+        Parameters:
+        - C (float): Regularization parameter (default: 1.0)
+        - tol (float): Tolerance for identifying support vectors (default: 1e-5)
         """
         self.C = C
         self.tol = tol
-        self.w = None  # Vektor bobot (weight vector)
+        self.w = None  # Weight vector
         self.b = None  # Bias
         self.support_vectors_ = None  # Support vectors
         self.alphas = None  # Lagrange multipliers (alpha)
-        self.sv_y = None  # Label support vectors
+        self.sv_y = None  # Labels of support vectors
 
     def fit(self, X, y):
         """
-        Melatih model SVM menggunakan formulasi dual dan quadratic programming.
+        Train the SVM model using the dual formulation and quadratic programming.
         
-        Parameter:
-        - X (np.array): Matriks fitur berukuran (n_samples, n_features)
+        Parameters:
+        - X (np.array): Feature matrix of shape (n_samples, n_features)
         - y (np.array): Vektor label berukuran (n_samples,)
         """
         n_samples, n_features = X.shape
         
-        # Pastikan y berbentuk vektor kolom dan bertipe float
+        # Ensure y is a column vector and of type float
         y = y.reshape(-1, 1).astype(np.float64)
         
-        # --- Langkah 1: Hitung Gram matrix untuk kernel linear ---
+        # --- Step 1: Compute Gram matrix for linear kernel ---
         # K_ij = X_i · X_j (dot product)
-        # Sesuai rumus: K = X @ X.T
+        # According to the formula: K = X @ X.T
         K = np.dot(X, X.T)
         
-        # --- Langkah 2: Siapkan parameter quadratic programming (QP) ---
+        # --- Step 2: Prepare quadratic programming (QP) parameters ---
         # Quadratic term: P_ij = y_i y_j K_ij
-        # Sesuai rumus: P = np.outer(y, y) * K
+        # According to the formula: P = np.outer(y, y) * K
         P = matrix(np.outer(y, y) * K)  # (n_samples, n_samples)
         
-        # Linear term: q = -1 (karena kita memaksimalkan sum(alpha) - 0.5*alpha^T P alpha)
+        # Linear term: q = -1 (because we maximize sum(alpha) - 0.5*alpha^T P alpha)
         q = matrix(-np.ones((n_samples, 1)))  # (n_samples, 1)
         
-        # --- Kendala Inequality: 0 <= alpha_i <= C ---
-        # Bentuk matriks G dan h untuk kendala box:
+        # --- Inequality constraints: 0 <= alpha_i <= C ---
+        # Form G and h matrices for box constraints:
         # -alpha_i <= 0 --> G_upper = -I, h_upper = 0
         # alpha_i <= C  --> G_lower = I, h_lower = C
-        G_upper = -np.eye(n_samples)  # Bagian untuk -alpha_i <= 0
-        G_lower = np.eye(n_samples)   # Bagian untuk alpha_i <= C
-        G = matrix(np.vstack((G_upper, G_lower)))  # Gabung kedua bagian
+        G_upper = -np.eye(n_samples)  # Part for -alpha_i <= 0
+        G_lower = np.eye(n_samples)   # Part for alpha_i <= C
+        G = matrix(np.vstack((G_upper, G_lower)))  # Combine both parts
         
         h_upper = np.zeros((n_samples, 1))
         h_lower = np.ones((n_samples, 1)) * self.C
         h = matrix(np.vstack((h_upper, h_lower)))  # (2*n_samples, 1)
         
-        # --- Kendala Equality: sum(alpha_i y_i) = 0 ---
-        # Bentuk matriks A dan b
+        # --- Equality constraint: sum(alpha_i y_i) = 0 ---
+        # Form A and b matrices
         A = matrix(y.T.astype(np.float64))  # (1, n_samples)
-        b = matrix(0.0)  # Skalar 0
+        b = matrix(0.0)  # Scalar 0
         
-        # --- Langkah 3: Solve QP problem ---
-        solvers.options['show_progress'] = False  # Nonaktifkan output solver
+        # --- Step 3: Solve QP problem ---
+        solvers.options['show_progress'] = False  # Disable solver output
         solution = solvers.qp(P, q, G, h, A, b)
         
-        # Ekstrak solusi alpha
+        # Extract alpha solution
         alphas = np.ravel(solution['x'])  # (n_samples,)
         
-        # --- Langkah 4: Identifikasi Support Vectors ---
-        # Support vectors adalah sampel dengan alpha_i > toleransi
+        # --- Step 4: Identify Support Vectors ---
+        # Support vectors are samples with alpha_i > tolerance
         sv_mask = alphas > self.tol
         self.support_vectors_ = X[sv_mask]
         self.alphas = alphas[sv_mask]
         self.sv_y = y[sv_mask]
         
-        # --- Langkah 5: Hitung Bobot (w) dan Bias (b) ---
-        # Rumus bobot: w = sum(alpha_i y_i X_i)
+        # --- Step 5: Compute Weights (w) and Bias (b) ---
+        # Weight formula: w = sum(alpha_i y_i X_i)
         self.w = np.sum(self.alphas[:, np.newaxis] * self.sv_y * self.support_vectors_, axis=0)
         
-        # Rumus bias: b = rata-rata(y_i - w·X_i) untuk semua support vectors
+        # Bias formula: b = average(y_i - w·X_i) for all support vectors
         self.b = np.mean(self.sv_y - np.dot(self.support_vectors_, self.w))
+    
+    def predict_with_confidence(self, X):
+        """
+        Predict classes with confidence scores based on distance from decision boundary.
+        
+        Parameters:
+        - X (np.array): Input features
+        
+        Returns:
+        - Dictionary with predictions and confidence information
+        """
+        # Calculate raw decision function values: w·x + b
+        decision_values = np.dot(X, self.w) + self.b
+        
+        # Get class predictions
+        predictions = np.where(decision_values >= 0, 1, 0).astype(int)
+        
+        # Calculate distance to hyperplane
+        # Distance = |w·x + b| / ||w||
+        # This gives the geometric distance from each point to the hyperplane
+        w_norm = np.linalg.norm(self.w)
+        distances = np.abs(decision_values) / w_norm
+        
+        # Convert distances to confidence scores (0-1 range) using sigmoid function
+        # This creates a smooth curve where values close to boundary have low confidence
+        # and values far from boundary have high confidence
+        confidence_scores = 1 / (1 + np.exp(-distances))
+        
+        # Format results for frontend
+        results = {
+            "predictions": predictions.tolist(),
+            "decision_values": decision_values.tolist(),
+            "distances": distances.tolist(),
+            "confidence_scores": confidence_scores.tolist(),
+            "confidence_percentages": (confidence_scores * 100).tolist()
+        }
+        
+        return results
         
     def predict(self, X):
         """
-        Melakukan prediksi pada data baru.
+        Perform predictions on new data.
         
-        Parameter:
-        - X (np.array): Matriks fitur berukuran (n_samples, n_features)
+        Parameters:
+        - X (np.array): Feature matrix of shape (n_samples, n_features)
         
         Returns:
-        - Prediksi kelas (0 atau 1) sebagai np.array
+        - Predicted classes (0 or 1) as np.array
         """
-        # Hitung nilai decision function: f(x) = w·X + b
+        # Compute decision function values: f(x) = w·X + b
         decision_values = np.dot(X, self.w) + self.b
         
-        # Terapkan aturan threshold: f(x) >= 0 → kelas 1, else kelas 0
+        # Apply threshold rule: f(x) >= 0 → class 1, else class 0
         return np.where(decision_values >= 0, 1, 0).astype(int)
