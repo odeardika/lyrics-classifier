@@ -18,7 +18,7 @@ function Hero() {
                     />
                 </div>
                 <p className='text-lg text-justify font-light text-slate-500 md:text-base'>Aplikasi web ini memanfaatkan pembelajaran mesin untuk menganalisis dan mengklasifikasikan lirik lagu. Dengan memproses konten teks dari lirik, aplikasi ini dapat mengidentifikasi pola, tema, atau genre, memberikan wawasan kepada pengguna tentang karakteristik lagu.</p>
-                <a href="/predict" className='px-6 py-3 text-white bg-sky-600 rounded-lg hover:bg-sky-700'>Mulai Sekarang</a>
+                <a href="/prediksi" className='px-6 py-3 text-white bg-sky-600 rounded-lg hover:bg-sky-700'>Mulai Sekarang</a>
             </div>
             <div className='hidden lg:flex lg:w-1/2 lg:justify-center'>
                 <Image

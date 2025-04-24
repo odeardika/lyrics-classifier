@@ -3,6 +3,9 @@ import React from "react";
 import Headers from "@components/Header/Header";
 import fetchPrediction from "@/module/predict";
 import Image from "next/image";
+import ConfidenceBar from "@components/Result/ConfidenceBar/ConfidenceBar";
+import DecisionBar from "@components/Result/DecisionBar/DecisionBar";
+import Probabilities from "@components/Result/Probabilities/Probabilities";
 
 export default function Page() {
     const emotionsDict = {
@@ -11,10 +14,16 @@ export default function Page() {
         1: "bahagia"
     };
     const [lyrics, setLyrics] = React.useState("");
-    const [model, setModel] = React.useState(2);
+    const [model, setModel] = React.useState(1);
     const [result, setResult] = React.useState(null);
     const [dropdownOpen, setDropdownOpen] = React.useState(false);
     const [isLyricsNotValid, setIsLyricsNotValid] = React.useState(false);
+    const [showMore, setShowMore] = React.useState(false);
+    const [confidenceScore, setConfidenceScore] = React.useState(0);
+    const [decisionValue, setDecisionValue] = React.useState(0);
+    const [distance, setDistance] = React.useState(0);
+    const [probabilitiesHappy, setProbabilitiesHappy] = React.useState(0);
+    const [probabilitiesSad, setProbabilitiesSad] = React.useState(0);
 
     const handleTextAreaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         setLyrics(e.target.value);
@@ -30,6 +39,16 @@ export default function Page() {
 
         if (response.status === 200) {
             setResult(response.data.emotion);
+
+            if (model === 1) {
+                setProbabilitiesHappy(response.data.probabilities.happy);
+                setProbabilitiesSad(response.data.probabilities.sad);
+            }
+            if (model === 2) {
+                setConfidenceScore(response.data.confidence_scores.confidence_scores);
+                setDecisionValue(response.data.confidence_scores.decision_values);
+                setDistance(response.data.confidence_scores.distances);
+            }
         } else {
             console.error("Error fetching prediction:", response.statusText);
         }
@@ -38,6 +57,7 @@ export default function Page() {
         setDropdownOpen(!dropdownOpen);
     }
     const handleDropdownSelector = (model : number) => {
+        setResult(null);
         setModel(model);
         setDropdownOpen(false);
     }
@@ -94,7 +114,26 @@ export default function Page() {
                         result !== null && (
                             <div id="Result" className="border border-gray-300 rounded-md w-full my-5 p-4">
                                 <h2>Hasil : </h2>
-                                <p>Teks <span className="text-sky-600">data</span> yang Anda masukkan adalah <span className={`${(result === 0) ? "text-red-500" : "text-green-500"}`}>{emotionsDict[result]}</span></p>
+                                <p className="mb-2">Teks <span className="text-sky-600">data</span> yang Anda masukkan adalah <span className={`${(result === 0) ? "text-red-500" : "text-green-500"}`}>{emotionsDict[result]}</span></p>
+                                <div className={`${showMore ? "" : "hidden"}`}>
+                                    {
+                                        (model === 1) ? (
+                                            <>
+                                            <Probabilities probabilities={{ happy: probabilitiesHappy, sad: probabilitiesSad }} />
+                                            </>
+                                        ) : (
+                                            <div className="flex flex-col gap-2">
+                                                <ConfidenceBar score={confidenceScore} />
+                                                <DecisionBar decisionValue={decisionValue} distance={distance} />
+                                            </div>
+                                        )
+                                    }
+                                </div>
+                                <div 
+                                className="text-sm text-blue-600 cursor-pointer select-none underline"
+                                onClick={() => setShowMore(!showMore)}
+                                >{showMore ? "lebih sedikit" : "lebih banyak"}</div>
+                                
                             </div>
                         )
                     }
