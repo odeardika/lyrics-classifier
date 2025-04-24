@@ -1,6 +1,8 @@
 import json
+import os
 
-with open('data/lyrics_list.json', 'r') as file:
+file_path = os.path.join(os.path.dirname(__file__), 'data', 'lyrics_list.json')
+with open(file_path, 'r') as file:
     data = json.load(file)
     
 list_key = data['list_key']
