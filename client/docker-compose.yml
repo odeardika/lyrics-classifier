@@ -1,0 +1,9 @@
+version: '3.9'
+
+services:
+  nextapp:
+    container_name: lyrics-fe
+    image: lyrics-fe
+    build: .
+    ports:
+      - "3000:3000"
