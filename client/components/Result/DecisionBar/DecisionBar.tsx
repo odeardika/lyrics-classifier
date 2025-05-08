@@ -13,7 +13,7 @@ const DecisionBar: React.FC<DecisionBarProps> = ({ decisionValue, distance }) =>
   
     const dataPositionStyle = isPositive
       ? { left: `calc(50% + ${percentage / 2}%)` }
-      : { left: `calc(50% - ${percentage / 2}%)` };
+      : { right: `calc(50% - ${percentage / 2}%)` };
   
     return (
       <div className="w-full mx-auto space-y-2">

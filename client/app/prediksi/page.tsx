@@ -3,7 +3,7 @@ import React from "react";
 import Headers from "@components/Header/Header";
 import fetchPrediction from "@/module/predict";
 import Image from "next/image";
-import ConfidenceBar from "@components/Result/ConfidenceBar/ConfidenceBar";
+// import ConfidenceBar from "@components/Result/ConfidenceBar/ConfidenceBar";
 import DecisionBar from "@components/Result/DecisionBar/DecisionBar";
 import Probabilities from "@components/Result/Probabilities/Probabilities";
 
@@ -19,7 +19,7 @@ export default function Page() {
     const [dropdownOpen, setDropdownOpen] = React.useState(false);
     const [isLyricsNotValid, setIsLyricsNotValid] = React.useState(false);
     const [showMore, setShowMore] = React.useState(false);
-    const [confidenceScore, setConfidenceScore] = React.useState(0);
+    // const [confidenceScore, setConfidenceScore] = React.useState(0);
     const [decisionValue, setDecisionValue] = React.useState(0);
     const [distance, setDistance] = React.useState(0);
     const [probabilitiesHappy, setProbabilitiesHappy] = React.useState(0);
@@ -45,7 +45,7 @@ export default function Page() {
                 setProbabilitiesSad(response.data.probabilities.sad);
             }
             if (model === 2) {
-                setConfidenceScore(response.data.confidence_scores.confidence_scores);
+                // setConfidenceScore(response.data.confidence_scores.confidence_scores);
                 setDecisionValue(response.data.confidence_scores.decision_values);
                 setDistance(response.data.confidence_scores.distances);
             }
@@ -123,7 +123,7 @@ export default function Page() {
                                             </>
                                         ) : (
                                             <div className="flex flex-col gap-2">
-                                                <ConfidenceBar score={confidenceScore} />
+                                                {/* <ConfidenceBar score={confidenceScore} /> */}
                                                 <DecisionBar decisionValue={decisionValue} distance={distance} />
                                             </div>
                                         )
