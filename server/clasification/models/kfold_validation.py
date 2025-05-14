@@ -9,6 +9,11 @@ def KFoldValidation(naive_bayes, svm, X, y, n_splits=5):
     nb = deepcopy(naive_bayes)
     sv = deepcopy(svm)
     
+    print("Output deepcopy Naive Bayes :")
+    print(nb)
+    print("Output deepcopy SVM :")
+    print(sv)
+    
     kf = KFold(n_splits=n_splits, shuffle=True, random_state=42)
     
     # Initialize metric collections for both models
@@ -21,6 +26,11 @@ def KFoldValidation(naive_bayes, svm, X, y, n_splits=5):
     for train_index, test_index in kf.split(X):
         X_train, X_test = X[train_index], X[test_index]
         y_train, y_test = y[train_index], y[test_index]
+        
+        print(f"Data Latih : {len(X_train)} Lirik Lagu")
+        print(X_train)
+        print(f"Data Uji : {len(X_test)} Lirik Lagu")
+        print(X_test)
         
         # Train and evaluate Naive Bayes
         nb_clone = deepcopy(nb)
@@ -36,6 +46,11 @@ def KFoldValidation(naive_bayes, svm, X, y, n_splits=5):
         svm_clone = deepcopy(sv)
         svm_clone.fit(X_train, np.where(y_train <= 0, -1, 1))
         y_pred_svm = svm_clone.predict(X_test)
+        
+        print("Hasil Prediksi Naive Bayes :")
+        print(y_pred_nb)
+        print("Hasil Prediksi SVM :")
+        print(y_pred_svm)
         
         metrics['svm']['accuracy'].append(accuracy_score(y_test, y_pred_svm))
         metrics['svm']['precision'].append(precision_score(y_test, y_pred_svm, average='weighted'))
