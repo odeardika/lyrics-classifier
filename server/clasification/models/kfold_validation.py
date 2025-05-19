@@ -1,6 +1,5 @@
 from sklearn.model_selection import KFold
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
-
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix
 import numpy as np
 
 def KFoldValidation(naive_bayes, svm, X, y, n_splits=5):
@@ -22,11 +21,14 @@ def KFoldValidation(naive_bayes, svm, X, y, n_splits=5):
         'svm': {'accuracy': [], 'precision': [], 'recall': [], 'f1': []}
     }
     
+    
+    i = 0
     # Use the same fold splits for both models
     for train_index, test_index in kf.split(X):
         X_train, X_test = X[train_index], X[test_index]
         y_train, y_test = y[train_index], y[test_index]
         
+        print(f"Iterasi : {i+1}")
         print(f"Data Latih : {len(X_train)} Lirik Lagu")
         print(X_train)
         print(f"Data Uji : {len(X_test)} Lirik Lagu")
@@ -52,10 +54,21 @@ def KFoldValidation(naive_bayes, svm, X, y, n_splits=5):
         print("Hasil Prediksi SVM :")
         print(y_pred_svm)
         
+        tn, fp, fn, tp = list(confusion_matrix(y_test,y_pred_nb).ravel())
+        print(f"Iterasi NB: {i+1}")
+        print(f"TN = {int(tn)}, FP = {int(fp)}")
+        print(f"FN = {int(fn)}, TP = {int(tp)}")
+        tn, fp, fn, tp = list(confusion_matrix(y_test,y_pred_svm).ravel())
+        print(f"Iterasi SVM: {i+1}")
+        print(f"TN = {int(tn)}, FP = {int(fp)}")
+        print(f"FN = {int(fn)}, TP = {int(tp)}")
+
         metrics['svm']['accuracy'].append(accuracy_score(y_test, y_pred_svm))
         metrics['svm']['precision'].append(precision_score(y_test, y_pred_svm, average='weighted'))
         metrics['svm']['recall'].append(recall_score(y_test, y_pred_svm, average='weighted'))
         metrics['svm']['f1'].append(f1_score(y_test, y_pred_svm, average='weighted'))
+        
+        i +=1
     
     # Calculate summary statistics for both models
     results = {}
